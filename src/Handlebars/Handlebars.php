@@ -89,6 +89,11 @@ class Handlebars
     private $_escape = 'htmlspecialchars';
 
     /**
+     * @var delimiters default {}
+     */
+    private $_delimiters = '{ }';
+
+    /**
      * @var array parametes to pass to escape function
      */
     private $_escapeArgs = array(
@@ -128,6 +133,10 @@ class Handlebars
 
         if (isset($options['cache'])) {
             $this->setCache($options['cache']);
+        }
+
+        if (isset($options['delimiters'])) {
+            $this->setDelimiters($options['delimiters']);
         }
 
         if (isset($options['escape'])) {
@@ -182,6 +191,10 @@ class Handlebars
     public function setHelpers(Helpers $helpers)
     {
         $this->_helpers = $helpers;
+    }
+
+    public function setDelimiters($delimiters) {
+        $this->_delimiters = $delimiters;
     }
 
     /**
@@ -523,7 +536,7 @@ class Handlebars
         $hash = md5(sprintf('version: %s, data : %s', self::VERSION, $source));
         $tree = $this->getCache()->get($hash);
         if ($tree === false) {
-            $tokens = $this->getTokenizer()->scan($source);
+            $tokens = $this->getTokenizer()->scan($source, $this->_delimiters);
             $tree = $this->getParser()->parse($tokens);
             $this->getCache()->set($hash, $tree);
         }
